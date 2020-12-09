@@ -57,22 +57,7 @@ class CarInterface(CarInterfaceBase):
     ret.lateralTuning.pid.kfBP = [0., 10., 30.]
     ret.lateralTuning.pid.kfV = [0.000015, 0.00002, 0.000025]
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+       
     if opParams().get('Enable_INDI'):
       ret.lateralTuning.init('indi')
       ret.lateralTuning.indi.outerLoopGain = 3.  # stock is 2.0.  Trying out 2.5
@@ -248,19 +233,7 @@ class CarInterface(CarInterfaceBase):
     if Params().get('dp_hkg_smart_mdps') == b'1':
         ret.minSteerSpeed = 0.
     ret = common_interface_get_params_lqr(ret)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+     
 
     # TODO: get actual value, for now starting with reasonable value for
     # civic and scaling by mass and wheelbase
