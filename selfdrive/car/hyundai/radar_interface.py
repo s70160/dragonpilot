@@ -68,4 +68,3 @@ class RadarInterface(RadarInterfaceBase):
 
     ret.points = list(self.pts.values())
     return ret
-
