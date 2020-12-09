@@ -317,7 +317,7 @@ FEATURES = {
   "send_lfa_mfa": set([CAR.SONATA, CAR.PALISADE, CAR.SANTA_FE, CAR.KIA_NIRO_EV, CAR.KONA_EV, CAR.KONA,
                        CAR.IONIQ, CAR.IONIQ_EV_LTD]),
 
-  "allow_high_steer": set([CAR.KONA, CAR.KONA_EV, CAR.KONA_HEV, CAR.KIA_NIRO_EV]),
+  "allow_high_steer": set([CAR.KONA, CAR.KONA_EV, CAR.KIA_NIRO_EV]),
 }
 
 ELEC_VEH = set([CAR.IONIQ_EV_LTD, CAR.KONA_EV, CAR.KIA_NIRO_EV])
