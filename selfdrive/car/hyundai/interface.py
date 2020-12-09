@@ -184,9 +184,7 @@ class CarInterface(CarInterfaceBase):
       ret.steerRatio = 12.069
 
     # these cars require a special panda safety mode due to missing counters and checksums in the messages
-    if candidate in [CAR.HYUNDAI_GENESIS, CAR.IONIQ_EV_LTD, CAR.IONIQ, CAR.KONA_EV, CAR.KIA_SORENTO, CAR.SONATA_2019,
-                     CAR.KIA_NIRO_EV, CAR.KIA_OPTIMA, CAR.VELOSTER, CAR.KIA_STINGER, CAR.GENESIS_G70, CAR.GENESIS_G80]:
-    ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
+    
     ret.mdpsHarness = Params().get('MdpsHarnessEnabled') == b'1'    
     ret.sasBus = 0 if (688 in fingerprint[0] or not ret.mdpsHarness) else 1    
     ret.fcaBus = 0 if 909 in fingerprint[0] else 2 if 909 in fingerprint[2] else -1    
@@ -196,6 +194,10 @@ class CarInterface(CarInterfaceBase):
     ret.evgearAvailable = True if 882 in fingerprint[0] else False    
     ret.emsAvailable = True if 608 and 809 in fingerprint[0] else False      
     ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
+    
+    if candidate in [CAR.HYUNDAI_GENESIS, CAR.IONIQ_EV_LTD, CAR.IONIQ, CAR.KONA_EV, CAR.KIA_SORENTO, CAR.SONATA_2019,
+                     CAR.KIA_NIRO_EV, CAR.KIA_OPTIMA, CAR.VELOSTER, CAR.KIA_STINGER, CAR.GENESIS_G70, CAR.GENESIS_G80]:
+      ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
 
       
     if Params().get('SccEnabled') == b'1':
