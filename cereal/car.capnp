@@ -431,16 +431,16 @@ struct CarParams {
   radarTimeStep @45: Float32 = 0.05;  # time delta between radar updates, 20Hz is very standard
   communityFeature @46: Bool;  # true if a community maintained feature is detected
   fingerprintSource @49: FingerprintSource;
-  mdpsHarness @51: Bool;
-  sasBus @52: Int8;
-  fcaBus @53: Int8;
-  bsmAvailable @54: Bool;
-  lfaAvailable @55: Bool;
-  sccBus @56: Int8;
-  radarDisablePossible @57: Bool;
-  lvrAvailable @58: Bool;
-  evgearAvailable @59: Bool;
-  emsAvailable @60: Bool;
+  mdpsHarness @50: Bool;
+  sasBus @51: Int8;
+  fcaBus @52: Int8;
+  bsmAvailable @53: Bool;
+  lfaAvailable @54: Bool;
+  sccBus @55: Int8;
+  radarDisablePossible @56: Bool;
+  lvrAvailable @57: Bool;
+  evgearAvailable @58: Bool;
+  emsAvailable @59: Bool;
 
   struct LateralParams {
     torqueBP @0 :List(Int32);
