@@ -43,7 +43,7 @@ if lfa_available:
     values["CF_Lkas_SysWarning"] = 4 if sys_warning else 0
 
     
-  elif car_fingerprint == CAR.HYUNDAI_GENESIS:
+  if car_fingerprint == CAR.HYUNDAI_GENESIS:
     # This field is actually LdwsActivemode
     # Genesis and Optima fault when forwarding while engaged
     values["CF_Lkas_LdwsActivemode"] = 2
