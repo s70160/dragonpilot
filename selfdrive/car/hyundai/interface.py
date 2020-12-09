@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from cereal import car
-
+from common.dp_conf import Params
 selfdrive.config import Conversions as CV
 from selfdrive.car.hyundai.values import CAR, Buttons
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
@@ -58,7 +58,7 @@ class CarInterface(CarInterfaceBase):
     ret.lateralTuning.pid.kfV = [0.000015, 0.00002, 0.000025]
     
        
-    if opParams().get('Enable_INDI'):
+    if Params().get('Enable_INDI'):
       ret.lateralTuning.init('indi')
       ret.lateralTuning.indi.outerLoopGain = 3.  # stock is 2.0.  Trying out 2.5
       ret.lateralTuning.indi.innerLoopGain = 2.
@@ -221,7 +221,7 @@ class CarInterface(CarInterfaceBase):
     if ret.radarOffCan or (ret.sccBus == 2) or Params().get('EnableOPwithCC') == b'0':
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiCommunityNonscc
 
-    if ret.mdpsHarness or opParams().get('smartMDPS'):
+    if ret.mdpsHarness or Params().get('smartMDPS'):
       ret.minSteerSpeed = 0.
     
     
