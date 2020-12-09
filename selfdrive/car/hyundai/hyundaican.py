@@ -10,7 +10,7 @@ def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
                   left_lane, right_lane,
                   left_lane_depart, right_lane_depart, lfa_available, bus):
   
-　 values = lkas11
+　values = lkas11
   values["CF_Lkas_LdwsSysState"] = 3 if steer_req else sys_state
   values["CF_Lkas_SysWarning"] = sys_warning
   values["CF_Lkas_LdwsLHWarning"] = left_lane_depart
@@ -22,7 +22,7 @@ def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
   values["CF_Lkas_Chksum"] = 0
 
 　if values["CF_Lkas_LdwsOpt_USM"] == 4:
-    values["CF_Lkas_LdwsOpt_USM"] = 3
+     values["CF_Lkas_LdwsOpt_USM"] = 3
 
   if lfa_available:
     values["CF_Lkas_LdwsActivemode"] = int(left_lane) + (int(right_lane) << 1)
@@ -69,14 +69,15 @@ def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
 
 
 def create_clu11(packer, bus, clu11, button, speed, cnt):
-  values = clu11
+    values = clu11
   
   if bus != 1:
     values["CF_Clu_CruiseSwState"] = button
     values["CF_Clu_Vanz"] = speed
   else:
     values["CF_Clu_Vanz"] = speed
-  values["CF_Clu_AliveCnt1"] = cnt
+    values["CF_Clu_AliveCnt1"] = cnt
+    
   return packer.make_can_msg("CLU11", bus, values)
 
 
@@ -111,19 +112,19 @@ def create_scc11(packer, enabled, set_speed, lead_visible, lead_dist, lead_vrel,
       values["VSetDis"] = set_speed
     if standstill:
       values["SCCInfoDisplay"] = 0
-    values["DriverAlertDisplay"] = 0
-    values["TauGapSet"] = gapsetting
-    values["ObjValid"] = lead_visible
-    values["ACC_ObjStatus"] = lead_visible
-    values["ACC_ObjRelSpd"] = lead_vrel
-    values["ACC_ObjDist"] = lead_dist
-    values["ACC_ObjLatPos"] = -lead_yrel
+      values["DriverAlertDisplay"] = 0
+      values["TauGapSet"] = gapsetting
+      values["ObjValid"] = lead_visible
+      values["ACC_ObjStatus"] = lead_visible
+      values["ACC_ObjRelSpd"] = lead_vrel
+      values["ACC_ObjDist"] = lead_dist
+      values["ACC_ObjLatPos"] = -lead_yrel
 
-    if nosccradar:
+   if nosccradar:
       values["MainMode_ACC"] = sendaccmode
       values["AliveCounterACC"] = scc11cnt
   elif nosccradar:
-    values["AliveCounterACC"] = scc11cnt
+      values["AliveCounterACC"] = scc11cnt
 
   return packer.make_can_msg("SCC11", 0, values)
 
@@ -134,8 +135,8 @@ def create_scc12(packer, apply_accel, enabled, standstill, gaspressed, brakepres
   if not usestockscc and not aebcmdact:
     if enabled and not brakepressed:
       values["ACCMode"] = 2 if gaspressed and (apply_accel > -0.2) else 1
-      if apply_accel < 0.0 and standstill:
-        values["StopReq"] = 1
+    if apply_accel < 0.0 and standstill:
+      values["StopReq"] = 1
       values["aReqRaw"] = apply_accel
       values["aReqValue"] = apply_accel
     else:
