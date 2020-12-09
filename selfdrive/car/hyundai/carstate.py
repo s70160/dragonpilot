@@ -346,7 +346,7 @@ class CarState(CarStateBase):
       checks += [
         ("E_EMS11", 50),
       ]
-      elif CP.carFingerprint in HYBRID_VEH:
+    elif CP.carFingerprint in HYBRID_VEH:
       signals += [
         ("CR_Vcu_AccPedDep_Pc", "EV_PC4", 0),
       ]
