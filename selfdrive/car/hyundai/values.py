@@ -322,7 +322,7 @@ FEATURES = {
 
 ELEC_VEH = set([CAR.IONIQ_EV_LTD, CAR.KONA_EV, CAR.KIA_NIRO_EV])
 
-HYBRID_VEH = set([CAR.IONIQ,])
+HYBRID_VEH = set([CAR.IONIQ])
 DBC = {
   CAR.ELANTRA: dbc_dict('hyundai_kia_generic', None),
   CAR.ELANTRA_GT_I30: dbc_dict('hyundai_kia_generic', None),
