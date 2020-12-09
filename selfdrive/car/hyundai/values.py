@@ -315,14 +315,14 @@ FEATURES = {
 
   # send LFA MFA message for new HKG models
   "send_lfa_mfa": set([CAR.SONATA, CAR.PALISADE, CAR.SANTA_FE, CAR.KIA_NIRO_EV, CAR.KONA_EV, CAR.KONA,
-                       CAR.IONIQ_HEV, CAR.IONIQ_EV_LTD]),
+                       CAR.IONIQ, CAR.IONIQ_EV_LTD]),
 
   "allow_high_steer": set([CAR.KONA, CAR.KONA_EV, CAR.KONA_HEV, CAR.KIA_NIRO_EV]),
 }
 
 ELEC_VEH = set([CAR.IONIQ_EV_LTD, CAR.KONA_EV, CAR.KIA_NIRO_EV])
 
-HYBRID_VEH = set([CAR.KIA_OPTIMA_HEV, CAR.SONATA_HEV_2019, CAR.SONATA_HEV, CAR.IONIQ_HEV, CAR.KIA_CADENZA_HEV, CAR.GRANDEUR_HEV, CAR.KIA_NIRO_HEV])
+HYBRID_VEH = set([CAR.IONIQ,])
 DBC = {
   CAR.ELANTRA: dbc_dict('hyundai_kia_generic', None),
   CAR.ELANTRA_GT_I30: dbc_dict('hyundai_kia_generic', None),
