@@ -5,7 +5,6 @@ from selfdrive.car.hyundai.values import CAR, CHECKSUM
 
 hyundai_checksum = crcmod.mkCrcFun(0x11D, initCrc=0xFD, rev=False, xorOut=0xdf)
 
-
 def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
                   lkas11, sys_warning, sys_state, enabled,
                   left_lane, right_lane,
@@ -26,6 +25,7 @@ if values["CF_Lkas_LdwsOpt_USM"] == 4:
 if lfa_available:
     values["CF_Lkas_LdwsActivemode"] = int(left_lane) + (int(right_lane) << 1)
     values["CF_Lkas_LdwsOpt_USM"] = 2
+
 
     # FcwOpt_USM 5 = Orange blinking car + lanes
     # FcwOpt_USM 4 = Orange car + lanes
@@ -48,7 +48,7 @@ if lfa_available:
   elif car_fingerprint == CAR.KIA_OPTIMA:
     values["CF_Lkas_LdwsActivemode"] = 0
 
-  dat = packer.make_can_msg("LKAS11", 0, values)[2]
+    dat = packer.make_can_msg("LKAS11", 0, values)[2]
 
   if car_fingerprint in CHECKSUM["crc8"]:
     # CRC Checksum as seen on 2019 Hyundai Santa Fe
@@ -61,21 +61,25 @@ if lfa_available:
     # Checksum of first 6 Bytes and last Byte as seen on 2018 Kia Stinger
     checksum = (sum(dat[:6]) + dat[7]) % 256
 
-  values["CF_Lkas_Chksum"] = checksum
+    values["CF_Lkas_Chksum"] = checksum
 
   return packer.make_can_msg("LKAS11", bus, values)
 
 
 def create_clu11(packer, bus, clu11, button, speed, cnt):
     values = clu11
-
+  
   if bus != 1:
     values["CF_Clu_CruiseSwState"] = button
     values["CF_Clu_Vanz"] = speed
   else:
     values["CF_Clu_Vanz"] = speed
     values["CF_Clu_AliveCnt1"] = cnt
+    
   return packer.make_can_msg("CLU11", bus, values)
+
+
+
 
 def create_lfa_mfa(packer, frame, enabled):
   values = {
@@ -114,12 +118,12 @@ def create_scc11(packer, enabled, set_speed, lead_visible, lead_dist, lead_vrel,
       values["ACC_ObjDist"] = lead_dist
       values["ACC_ObjLatPos"] = -lead_yrel
 
-    if nosccradar:
+   if nosccradar:
       values["MainMode_ACC"] = sendaccmode
       values["AliveCounterACC"] = scc11cnt
   elif nosccradar:
       values["AliveCounterACC"] = scc11cnt
- 
+
   return packer.make_can_msg("SCC11", 0, values)
 
 def create_scc12(packer, apply_accel, enabled, standstill, gaspressed, brakepressed, aebcmdact, scc12,
