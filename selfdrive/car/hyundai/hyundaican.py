@@ -43,11 +43,11 @@ if lfa_available:
     values["CF_Lkas_SysWarning"] = 4 if sys_warning else 0
 
     
-  if car_fingerprint == CAR.HYUNDAI_GENESIS:
+    elif car_fingerprint == CAR.HYUNDAI_GENESIS:
     # This field is actually LdwsActivemode
     # Genesis and Optima fault when forwarding while engaged
     values["CF_Lkas_LdwsActivemode"] = 2
-  elif car_fingerprint == CAR.KIA_OPTIMA:
+    elif car_fingerprint == CAR.KIA_OPTIMA:
     values["CF_Lkas_LdwsActivemode"] = 0
 
   dat = packer.make_can_msg("LKAS11", 0, values)[2]
