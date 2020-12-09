@@ -79,7 +79,7 @@ class CarState(CarStateBase):
         if self.cancel_button_timer == 0:
           self.cancel_button_count = 0
       else:
-      self.cancel_button_count = 0
+        self.cancel_button_count = 0
       
     # cruise state
     if not self.CP.enableCruise:
