@@ -27,8 +27,7 @@ class CarState(CarStateBase):
     self.leftblinkerflashdebounce = 0
     self.rightblinkerflashdebounce = 0
     
-  def update(self, cp, cp_cam):
-    def update(self, cp, cp2, cp_cam):
+  def update(self, cp, cp2, cp_cam):
     cp_mdps = cp2 if self.CP.mdpsHarness else cp
     cp_sas = cp2 if self.CP.sasBus else cp
     cp_scc = cp_cam if ((self.CP.sccBus == 2) or self.CP.radarOffCan) else cp
