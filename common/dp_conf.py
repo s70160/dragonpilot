@@ -117,6 +117,7 @@ confs = [
   {'name': 'EnableOPwithCC', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
   {'name': 'RadarDisableEnabled', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
   {'name': 'enableLKASbutton', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
+  {'name': 'Enable_INDI', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
   # honda
   {'name': 'dp_honda_eps_mod', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
   #misc
