@@ -54,6 +54,7 @@ keys = {
   b"SccEnabled": [TxType.PERSISTENT],
   b"EnableOPwithCC": [TxType.PERSISTENT],
   b"SccHarnessPresent": [TxType.PERSISTENT],
+  b"Enable_INDI": [TxType.PERSISTENT],
   b"PandaFirmware": [TxType.CLEAR_ON_MANAGER_START, TxType.CLEAR_ON_PANDA_DISCONNECT],
   b"PandaFirmwareHex": [TxType.CLEAR_ON_MANAGER_START, TxType.CLEAR_ON_PANDA_DISCONNECT],
   b"PandaDongleId": [TxType.CLEAR_ON_MANAGER_START, TxType.CLEAR_ON_PANDA_DISCONNECT],
