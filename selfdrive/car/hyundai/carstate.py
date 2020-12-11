@@ -223,6 +223,7 @@ class CarState(CarStateBase):
       ("WHL_SPD_RR", "WHL_SPD11", 0),
 
       ("YAW_RATE", "ESP12", 0),
+      ("AVH_STAT", "ESP11", 0),
 
       ("CF_Gway_DrvSeatBeltInd", "CGW4", 1),
 
@@ -272,6 +273,7 @@ class CarState(CarStateBase):
       ("TCS15", 10),
       ("CLU11", 50),
       ("ESP12", 100),
+      ("ESP11", 100),
       ("CGW1", 10),
       ("CGW4", 5),
       ("WHL_SPD11", 50),
