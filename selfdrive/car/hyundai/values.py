@@ -24,7 +24,7 @@ class CAR:
   ELANTRA = "HYUNDAI ELANTRA LIMITED ULTIMATE 2017"
   ELANTRA_GT_I30 = "HYUNDAI I30 N LINE 2019 & GT 2018 DCT"
   HYUNDAI_GENESIS = "HYUNDAI GENESIS 2015-2016"
-  IONIQ = "HYUNDAI IONIQ ELECTRIC PREMIUM SE 2020"
+  IONIQ = "HYUNDAI IONIQ HYBRID 2018-2020"
   IONIQ_EV_LTD = "HYUNDAI IONIQ ELECTRIC LIMITED 2019"
   KONA = "HYUNDAI KONA 2020"
   KONA_EV = "HYUNDAI KONA ELECTRIC 2019"
@@ -258,7 +258,7 @@ DBC = {
   CAR.GENESIS_G90: dbc_dict('hyundai_kia_generic', None),
   CAR.HYUNDAI_GENESIS: dbc_dict('hyundai_kia_generic', None),
   CAR.IONIQ_EV_LTD: dbc_dict('hyundai_kia_generic', None),
-  CAR.IONIQ: dbc_dict('hyundai_kia_generic', None),
+  CAR.IONIQ: dbc_dict('hyundai_kia_generic_hybrid', None),
   CAR.KIA_FORTE: dbc_dict('hyundai_kia_generic', None),
   CAR.KIA_NIRO_EV: dbc_dict('hyundai_kia_generic', None),
   CAR.KIA_OPTIMA: dbc_dict('hyundai_kia_generic', None),
