@@ -1,3 +1,4 @@
+from numpy import clip
 from cereal import car
 from common.realtime import DT_CTRL
 from cereal import car, messaging
