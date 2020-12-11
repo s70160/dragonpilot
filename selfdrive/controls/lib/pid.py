@@ -155,6 +155,9 @@ class PIDController:
       self.id -= self.i_unwind_rate * float(np.sign(self.id))
     else:
       i = self.id + error * self.k_i * self.rate
+      if self.last_error > 1.8 >= error and i > 0:
+        i = 0
+      i = min(i, 0.2)      
       control = self.p + self.f + i
 
       if self.convert is not None:
@@ -181,6 +184,6 @@ class PIDController:
 
     self.last_setpoint = float(setpoint)
     self.last_error = float(error)
-
+    self.last_kf = float(self.f)
     self.control = clip(control, self.neg_limit, self.pos_limit)
     return self.control
