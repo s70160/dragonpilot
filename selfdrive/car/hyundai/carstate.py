@@ -56,30 +56,12 @@ class CarState(CarStateBase):
     ret.steeringAngle = cp_sas.vl["SAS11"]['SAS_Angle']
     ret.steeringRate = cp_sas.vl["SAS11"]['SAS_Speed']
     ret.yawRate = cp.vl["ESP12"]['YAW_RATE']
-    
-    self.leftblinkerflash = cp.vl["CGW1"]['CF_Gway_TurnSigLh'] != 0 and cp.vl["CGW1"]['CF_Gway_TSigLHSw'] == 0
-    self.rightblinkerflash = cp.vl["CGW1"]['CF_Gway_TurnSigRh'] != 0 and cp.vl["CGW1"]['CF_Gway_TSigRHSw'] == 0
-    
-    if self.leftblinkerflash:
-      self.leftblinkerflashdebounce = 50
-    elif self.leftblinkerflashdebounce > 0:
-      self.leftblinkerflashdebounce -= 1
-
-    if self.rightblinkerflash:
-      self.rightblinkerflashdebounce = 50
-    elif self.rightblinkerflashdebounce > 0:
-      self.rightblinkerflashdebounce -= 1
-    
-    ret.leftBlinker = cp.vl["CGW1"]['CF_Gway_TSigLHSw'] != 0 or self.leftblinkerflashdebounce > 0
-    ret.rightBlinker = cp.vl["CGW1"]['CF_Gway_TSigRHSw'] != 0 or self.rightblinkerflashdebounce > 0
-
+    ret.leftBlinker, ret.rightBlinker = self.update_blinker(50, cp.vl["CGW1"]['CF_Gway_TurnSigLh'],
+                                                            cp.vl["CGW1"]['CF_Gway_TurnSigRh'])
     ret.steeringTorque = cp_mdps.vl["MDPS12"]['CR_Mdps_StrColTq']
     ret.steeringTorqueEps = cp_mdps.vl["MDPS12"]['CR_Mdps_OutTq']
-    
     ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD
     ret.steerWarning = cp_mdps.vl["MDPS12"]['CF_Mdps_ToiUnavail'] != 0
-
-    
     
     self.brakeHold = (cp.vl["ESP11"]['AVH_STAT'] == 1)
     
@@ -188,7 +170,7 @@ class CarState(CarStateBase):
       else:
         ret.gearShifter = GearShifter.unknown
     # Gear Selecton - This is not compatible with all Kia/Hyundai's, But is the best way for those it is compatible with
-    elif self.CP.lvrAvailable:
+    else:
       gear = cp.vl["LVR12"]["CF_Lvr_Gear"]
       if gear in (5, 8):  # 5: D, 8: sport mode
         ret.gearShifter = GearShifter.drive
@@ -249,9 +231,7 @@ class CarState(CarStateBase):
       ("CF_Gway_AstDrSw", "CGW1", 0),       # Passenger door
       ("CF_Gway_RLDrSw", "CGW2", 0),        # Rear reft door
       ("CF_Gway_RRDrSw", "CGW2", 0),        # Rear right door
-      ("CF_Gway_TSigLHSw", "CGW1", 0),
       ("CF_Gway_TurnSigLh", "CGW1", 0),
-      ("CF_Gway_TSigRHSw", "CGW1", 0),
       ("CF_Gway_TurnSigRh", "CGW1", 0),
       ("CF_Gway_ParkBrakeSw", "CGW1", 0),
 
