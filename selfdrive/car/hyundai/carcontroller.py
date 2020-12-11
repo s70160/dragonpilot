@@ -116,7 +116,8 @@ class CarController():
     self.dp_hkg_smart_mdps = Params().get('dp_hkg_smart_mdps') == b'1'
 
   def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert,
-             left_lane, right_lane, left_lane_depart, right_lane_depart, lead_visible, dragonconf):
+             left_lane, right_lane, left_lane_depart, right_lane_depart,
+             set_speed, lead_visible, lead_dist, lead_vrel, lead_yrel):
    
 
     # gas and brake
