@@ -200,8 +200,7 @@ class CarInterface(CarInterfaceBase):
     ret.emsAvailable = True if 608 and 809 in fingerprint[0] else False      
     ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
     
-    if candidate in [CAR.HYUNDAI_GENESIS, CAR.IONIQ_EV_LTD, CAR.IONIQ, CAR.KONA_EV, CAR.KIA_SORENTO, CAR.SONATA_2019,
-                     CAR.KIA_NIRO_EV, CAR.KIA_OPTIMA, CAR.VELOSTER, CAR.KIA_STINGER, CAR.GENESIS_G70, CAR.GENESIS_G80]:
+    if candidate in [CAR.IONIQ]:
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
 
       
