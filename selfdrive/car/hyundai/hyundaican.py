@@ -1,5 +1,5 @@
 import crcmod
-
+from common.op_params import opParams
 from common.params import Params
 
 from selfdrive.car.hyundai.values import CAR, CHECKSUM
@@ -204,7 +204,7 @@ def create_fca12(packer):
 
 def create_mdps12(packer, frame, mdps12):
   values = mdps12
-  if Params().get('enableLKASbutton'):
+  if opParams().get('enableLKASbutton'):
     values["CF_Mdps_ToiActive"] = 0
     values["CF_Mdps_ToiUnavail"] = 1
     values["CF_Mdps_MsgCount2"] = frame % 0x100
