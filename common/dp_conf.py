@@ -109,15 +109,7 @@ confs = [
   {'name': 'dp_toyota_lowest_cruise_override_at', 'default': 44, 'type': 'Float32', 'depends': [{'name': 'dp_car_detected', 'vals': ['toyota']}, {'name': 'dp_toyota_lowest_cruise_override', 'vals': [True]}], 'min': 0, 'max': 255., 'conf_type': ['param', 'struct']},
   {'name': 'dp_toyota_lowest_cruise_override_speed', 'default': 32, 'type': 'Float32', 'depends': [{'name': 'dp_car_detected', 'vals': ['toyota']}, {'name': 'dp_toyota_lowest_cruise_override_speed', 'vals': [True]}], 'min': 0, 'max': 255., 'conf_type': ['param', 'struct']},
   # hyundai
-  {'name': 'dp_hkg_smart_mdps', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
-  {'name': 'MdpsHarnessEnabled', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
-  {'name': 'SccEnabled', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
-  {'name': 'SccHarnessPresent', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
-  {'name': 'LongControlEnabled', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
-  {'name': 'EnableOPwithCC', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
-  {'name': 'RadarDisableEnabled', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
-  {'name': 'enableLKASbutton', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
-  {'name': 'Enable_INDI', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
+  {'name': 'dp_hkg_smart_mdps', 'default': True, 'type': 'Bool', 'conf_type': ['param']},  
   # honda
   {'name': 'dp_honda_eps_mod', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
   #misc
