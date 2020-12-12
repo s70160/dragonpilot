@@ -2,10 +2,13 @@
 from cereal import car
 from selfdrive.config import Conversions as CV
 from selfdrive.car.hyundai.values import CAR, FINGERPRINTS, Buttons
-from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
+from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint, , is_ecu_disconnected
 from selfdrive.car.interfaces import CarInterfaceBase
 from common.dp_common import common_interface_atl, common_interface_get_params_lqr
 from common.params import Params
+
+EventName = car.CarEvent.EventName
+ButtonType = car.CarState.ButtonEvent.Type
 
 class CarInterface(CarInterfaceBase):
   def __init__(self, CP, CarController, CarState):
@@ -15,6 +18,7 @@ class CarInterface(CarInterfaceBase):
     self.visiononlyWarning = False
     self.belowspeeddingtimer = 0.
     self.enabled_prev = False
+    
   @staticmethod
   def compute_gb(accel, speed):
     return float(accel) / 3.0
@@ -208,7 +212,7 @@ class CarInterface(CarInterfaceBase):
     
     ret.radarOffCan = (ret.sccBus == -1)
     
-    ret.openpilotLongitudinalControl = Params().get('LongControlEnabled') == b'1' and not (ret.sccBus == 0)
+    ret.openpilotLongitudinalControl = Params().get('LongControlEnabled') == True and not (ret.sccBus == 0)
     if ret.openpilotLongitudinalControl:
       ret.radarTimeStep = .05
   
@@ -245,7 +249,8 @@ class CarInterface(CarInterfaceBase):
     ret.tireStiffnessFront, ret.tireStiffnessRear = scale_tire_stiffness(ret.mass, ret.wheelbase, ret.centerToFront,
                                                                          tire_stiffness_factor=tire_stiffness_factor)
 
-    ret.enableCamera = True
+    ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS, ECU_FINGERPRINT, candidate, Ecu.fwdCamera) \
+                       or has_relay
 
     ret.radarDisablePossible = Params().get('RadarDisableEnabled') == b'1'
 
@@ -345,7 +350,7 @@ class CarInterface(CarInterfaceBase):
                 and ((self.CC.setspeed > self.CC.clu11_speed - 2) or ret.standstill or self.CC.usestockscc):
           events.add(EventName.buttonEnable)
           events.add(EventName.pcmEnable)
-        if b.type == ButtonType.cancel and b.pressed or self.CS.lkasbutton and opParams().get('enableLKASbutton'):
+        if b.type == ButtonType.cancel and b.pressed or self.CS.lkasbutton and Params().get('enableLKASbutton'):
           events.add(EventName.buttonCancel)
           events.add(EventName.pcmDisable)
         if b.type == ButtonType.altButton3 and b.pressed:
