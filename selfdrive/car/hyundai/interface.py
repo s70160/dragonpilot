@@ -269,17 +269,11 @@ class CarInterface(CarInterfaceBase):
     ret = self.CS.update(self.cp, self.cp2, self.cp_cam)
     ret.canValid = self.cp.can_valid and self.cp2.can_valid and self.cp_cam.can_valid
 
-
-    # dp
-    self.dragonconf = dragonconf
-    if ret.vEgo >= self.CP.minSteerSpeed:
-      ret.cruiseState.enabled = common_interface_atl(ret, dragonconf.dpAtl)
+     # speeds
+    ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
 
     events = self.create_common_events(ret)
-    
-    #TODO: addd abs(self.CS.angle_steers) > 90 to 'steerTempUnavailable' event
-
 
 
     # low speed steer alert hysteresis logic (only for cars with steer cut off above 10 m/s)
