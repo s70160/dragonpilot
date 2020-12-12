@@ -219,7 +219,7 @@ class CarInterface(CarInterfaceBase):
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
     
     if ret.mdpsHarness or \
-            (candidate in [CAR.IONIQ_HEV]):
+            (candidate in [CAR.IONIQ]):
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiCommunity
     
     if ret.radarOffCan or (ret.sccBus == 2) or opParams().get('EnableOPwithCC') == b'0':
