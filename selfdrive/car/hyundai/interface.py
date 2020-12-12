@@ -6,6 +6,7 @@ from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness,
 from selfdrive.car.interfaces import CarInterfaceBase
 from common.dp_common import common_interface_atl, common_interface_get_params_lqr
 from common.params import Params
+from common.op_params import opParams
 
 EventName = car.CarEvent.EventName
 ButtonType = car.CarState.ButtonEvent.Type
@@ -189,7 +190,7 @@ class CarInterface(CarInterfaceBase):
 
     # these cars require a special panda safety mode due to missing counters and checksums in the messages
     
-    ret.mdpsHarness = Params().get('MdpsHarnessEnabled') == b'1'    
+    ret.mdpsHarness = opParams().get('MdpsHarnessEnabled') == b'1'  
     ret.sasBus = 0 if (688 in fingerprint[0] or not ret.mdpsHarness) else 1    
     ret.fcaBus = 0 if 909 in fingerprint[0] else 2 if 909 in fingerprint[2] else -1    
     ret.bsmAvailable = True if 1419 in fingerprint[0] else False    
@@ -205,14 +206,14 @@ class CarInterface(CarInterfaceBase):
 
       
     if Params().get('SccEnabled') == b'1':
-      ret.sccBus = 2 if 1057 in fingerprint[2] and Params().get('SccHarnessPresent') == b'1' else 0 if 1057 in fingerprint[0] else -1
+      ret.sccBus = 2 if 1057 in fingerprint[2] and opParams().get('SccHarnessPresent') == b'1' else 0 if 1057 in fingerprint[0] else -1
     else:
       ret.sccBus = -1
     
     
     ret.radarOffCan = (ret.sccBus == -1)
     
-    ret.openpilotLongitudinalControl = Params().get('LongControlEnabled') == True and not (ret.sccBus == 0)
+    ret.openpilotLongitudinalControl = opParams().get('LongControlEnabled') == True and not (ret.sccBus == 0)
     if ret.openpilotLongitudinalControl:
       ret.radarTimeStep = .05
   
@@ -223,10 +224,10 @@ class CarInterface(CarInterfaceBase):
                           CAR.KIA_CADENZA_HEV, CAR.GRANDEUR_HEV, CAR.KIA_NIRO_HEV, CAR.KONA_HEV]):
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiCommunity
     
-    if ret.radarOffCan or (ret.sccBus == 2) or Params().get('EnableOPwithCC') == b'0':
+    if ret.radarOffCan or (ret.sccBus == 2) or opParams().get('EnableOPwithCC') == b'0':
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiCommunityNonscc
 
-    if ret.mdpsHarness or Params().get('smartMDPS'):
+    if ret.mdpsHarness or opParams().get('smartMDPS'):
       ret.minSteerSpeed = 0.
     
     
@@ -251,10 +252,10 @@ class CarInterface(CarInterfaceBase):
 
     ret.enableCamera = True
 
-    ret.radarDisablePossible = Params().get('RadarDisableEnabled') == b'1'
+    ret.radarDisablePossible = opParams().get('RadarDisableEnabled') == b'1'
 
-    ret.enableCruise = Params().get('EnableOPwithCC') == b'1' and ret.sccBus == 0
-
+    ret.enableCruise = opParams().get('EnableOPwithCC') == b'1' and ret.sccBus == 0
+    
     if ret.radarDisablePossible:
       ret.openpilotLongitudinalControl = True
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiCommunityNonscc # todo based on toggle
