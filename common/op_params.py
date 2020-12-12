@@ -61,16 +61,14 @@ class opParams:
     """
 
     VT = ValueTypes()
-    self.fork_params = {'Camera_Offset': Param(0.06, VT.number, 'This will reposition your vehicle if there is a lane hugging issue'
-                                                                'increase the offset(max 0.12) if the vehicle is hugging right lane'
-                                                                'decrease the offset(min 0.0) if the vehicle is hugging left lane'),
-                        'LCA_Min_Speed': Param(25.0, VT.number, 'The minimum speed for Lane Change Assist MPH/KPH'),
-                        'enableLKASbutton': Param(False, bool, 'general toggle to enable LKAS button, LKAS button press will cancel OP steer'),
+    self.fork_params = {'MdpsHarnessEnabled': Param(True, bool, 'Toggle to enable MdpsHarness'),
+                        'SccEnabled': Param(True, bool, 'Toggle to enable stock scc'),
+                        'enableLKASbutton': Param(True, bool, 'general toggle to enable LKAS button, LKAS button press will cancel OP steer'),
                         'Enable_INDI': Param(False, bool, 'Toggle to enable INDI tuning for lat control'),
-                        'OuterLoopGain': Param(3.1, VT.number, 'Turn Aggressiveness'),
-                        'InnerLoopGain': Param(2.1, VT.number, 'Over correction'),
-                        'RCTimeConstant': Param(1.4, VT.number, 'Time constant'),
-                        'ActuatorEffectiveness': Param(2., VT.number, 'Sensitivity of the actuator, increase for less pingpong, decrease if weak steering'),
+                        'SccHarnessPresent': Param(True, bool, 'Toggle to enable sccharness to op creat scc singal '),
+                        'LongControlEnabled': Param(True, bool, 'Toggle to enable longcontrol'),
+                        'EnableOPwithCC': Param(True, bool, 'Toggle to enable curise button for lat control'),
+                        'RadarDisableEnabled': Param(True, bool, 'Toggle to enable for disable radar'),
                         'smartMDPS': Param(True, bool, 'Toggle to enable smart MDPS'),
                         'nonlinearsas': Param(True, bool, 'Toggle to enable non linear desired steering angle based tune'),
                         }
