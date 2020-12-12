@@ -1,6 +1,4 @@
 from numpy import clip
-from cereal import car
-from common.realtime import DT_CTRL
 from cereal import car, messaging
 from selfdrive.car import apply_std_steer_torque_limits
 from selfdrive.car.hyundai.hyundaican import create_lkas11, create_clu11, create_lfa_mfa, \
@@ -192,7 +190,12 @@ class CarController():
                                    CS.lkas11, sys_warning, sys_state, enabled,
                                    left_lane, right_lane,
                                    left_lane_warning, right_lane_warning, self.lfa_available, 0))
-
+    if CS.CP.mdpsHarness:  # send lkas11 bus 1 if mdps
+      can_sends.append(create_lkas11(self.packer, frame, self.car_fingerprint, apply_steer, lkas_active,
+                                   CS.lkas11, sys_warning, sys_state, enabled,
+                                   left_lane, right_lane,
+                                   left_lane_warning, right_lane_warning, self.lfa_available, 1))
+      
     can_sends.append(create_clu11(self.packer, 1, CS.clu11, Buttons.NONE, enabled_speed, self.clu11_cnt))
 
 
