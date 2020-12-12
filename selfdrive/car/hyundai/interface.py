@@ -219,8 +219,7 @@ class CarInterface(CarInterfaceBase):
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
     
     if ret.mdpsHarness or \
-            (candidate in [CAR.SONATA_HEV, CAR.IONIQ_HEV, CAR.SONATA_HEV_2019,
-                          CAR.KIA_CADENZA_HEV, CAR.GRANDEUR_HEV, CAR.KIA_NIRO_HEV, CAR.KONA_HEV]):
+            (candidate in [CAR.IONIQ_HEV]):
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiCommunity
     
     if ret.radarOffCan or (ret.sccBus == 2) or opParams().get('EnableOPwithCC') == b'0':
