@@ -280,7 +280,7 @@ class CarState(CarStateBase):
     ]
 
     if CP.sccBus == 0:
-      ssignals += [
+      signals += [
         ("MainMode_ACC", "SCC11", 0),
         ("VSetDis", "SCC11", 0),
         ("SCCInfoDisplay", "SCC11", 0),
