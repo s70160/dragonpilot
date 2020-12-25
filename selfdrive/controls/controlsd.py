@@ -86,8 +86,7 @@ class Controls:
     passive = params.get("Passive", encoding='utf8') == "1" or \
               internet_needed or not openpilot_enabled_toggle
 
-    # detect sound card presence and ensure successful init
-    sounds_available = HARDWARE.get_sound_card_online()
+    
 
     car_recognized = self.CP.carName != 'mock'
     # If stock camera is disconnected, we loaded car controls and it's not dashcam mode
