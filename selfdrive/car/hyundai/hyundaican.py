@@ -1,7 +1,6 @@
 import crcmod
-from common.op_params import opParams
-from common.params import Params
 
+from common.op_params import opParams
 from selfdrive.car.hyundai.values import CAR, CHECKSUM
 
 hyundai_checksum = crcmod.mkCrcFun(0x11D, initCrc=0xFD, rev=False, xorOut=0xdf)
@@ -20,7 +19,6 @@ def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
   values["CF_Lkas_ActToi"] = steer_req
   values["CF_Lkas_ToiFlt"] = 0
   values["CF_Lkas_MsgCount"] = frame % 0x10
-  values["CF_Lkas_Chksum"] = 0
 
   if values["CF_Lkas_LdwsOpt_USM"] == 4:
     values["CF_Lkas_LdwsOpt_USM"] = 3
@@ -218,3 +216,4 @@ def create_mdps12(packer, frame, mdps12):
 
 def create_scc7d0(cmd):
   return[2000, 0, cmd, 0]
+

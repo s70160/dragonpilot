@@ -1,38 +1,37 @@
 from numpy import clip
+
 from cereal import car, messaging
 from selfdrive.car import apply_std_steer_torque_limits
+from selfdrive.car.hyundai.carstate import GearShifter
 from selfdrive.car.hyundai.hyundaican import create_lkas11, create_clu11, create_lfa_mfa, \
                                              create_scc11, create_scc12, create_scc13, create_scc14, \
                                              create_scc42a, create_scc7d0, create_fca11, create_fca12, create_mdps12
 from selfdrive.car.hyundai.values import Buttons, SteerLimitParams, CAR, FEATURES
 from opendbc.can.packer import CANPacker
-from common.dp_common import common_controller_ctrl
-from common.params import Params
 from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.longcontrol import LongCtrlState
-from selfdrive.car.hyundai.carstate import GearShifter
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
 # Accel Hard limits
 ACCEL_HYST_GAP = 0.1  # don't change accel command for small oscillations within this value
-ACCEL_MAX = 2.0  # 2.0 m/s2
+ACCEL_MAX = 2.  # 2.0 m/s2
 ACCEL_MIN = -3.5  # 3.5   m/s2
 ACCEL_SCALE = 1.
 
 def accel_hysteresis(accel, accel_steady):
 
-# for small accel oscillations within ACCEL_HYST_GAP, don't change the accel command
+  # for small accel oscillations within ACCEL_HYST_GAP, don't change the accel command
   if accel > accel_steady + ACCEL_HYST_GAP:
     accel_steady = accel - ACCEL_HYST_GAP
   elif accel < accel_steady - ACCEL_HYST_GAP:
     accel_steady = accel + ACCEL_HYST_GAP
   accel = accel_steady
-  
+
   return accel, accel_steady
 
 def accel_rate_limit(accel_lim, prev_accel_lim):
-    
+
   if accel_lim > 0:
     if accel_lim > prev_accel_lim:
       accel_lim = min(accel_lim, prev_accel_lim + 0.02)
@@ -48,39 +47,31 @@ def accel_rate_limit(accel_lim, prev_accel_lim):
 
 def process_hud_alert(enabled, fingerprint, visual_alert, left_lane,
                       right_lane, left_lane_depart, right_lane_depart):
-  sys_warning = (visual_alert == VisualAlert.steerRequired)
 
-  # initialize to no line visible
-  sys_state = 1
-  if left_lane and right_lane or sys_warning:  # HUD alert only display when LKAS status is active
-    sys_state = 3 if enabled or sys_warning else 4
-  elif left_lane:
-    sys_state = 5
-  elif right_lane:
-    sys_state = 6
+  sys_warning = (visual_alert == VisualAlert.steerRequired)
+  if sys_warning:
+      sys_warning = 1 if fingerprint in [CAR.HYUNDAI_GENESIS, CAR.GENESIS_G90, CAR.GENESIS_G80] else 3
+
+  if enabled or sys_warning:
+      sys_state = 3
+  else:
+      sys_state = 1
 
   # initialize to no warnings
   left_lane_warning = 0
   right_lane_warning = 0
   if left_lane_depart:
-    left_lane_warning = 1 if fingerprint in [CAR.GENESIS_G90, CAR.GENESIS_G80] else 2
+    left_lane_warning = 1 if fingerprint in [CAR.HYUNDAI_GENESIS, CAR.GENESIS_G90, CAR.GENESIS_G80] else 2
   if right_lane_depart:
-    right_lane_warning = 1 if fingerprint in [CAR.GENESIS_G90, CAR.GENESIS_G80] else 2
+    right_lane_warning = 1 if fingerprint in [CAR.HYUNDAI_GENESIS, CAR.GENESIS_G90, CAR.GENESIS_G80] else 2
 
   return sys_warning, sys_state, left_lane_warning, right_lane_warning
 
 
 class CarController():
   def __init__(self, dbc_name, CP, VM):
-    self.p = SteerLimitParams(CP)
-    self.packer = CANPacker(dbc_name)
-
     self.apply_steer_last = 0
     self.car_fingerprint = CP.carFingerprint
-    self.steer_rate_limited = False
-    self.last_resume_frame = 0
-    
-    # hkg
     self.cp_oplongcontrol = CP.openpilotLongitudinalControl
     self.packer = CANPacker(dbc_name)
     self.accel_steady = 0
@@ -107,17 +98,12 @@ class CarController():
     self.sendaccmode = not CP.radarDisablePossible
     self.enabled = False
     self.sm = messaging.SubMaster(['controlsState'])
-    
-    # dp
-    self.last_blinker_on = False
-    self.blinker_end_frame = 0.
-    self.dp_hkg_smart_mdps = Params().get('dp_hkg_smart_mdps') == b'1'
 
   def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert,
              left_lane, right_lane, left_lane_depart, right_lane_depart,
              set_speed, lead_visible, lead_dist, lead_vrel, lead_yrel):
-   
 
+    self.enabled = enabled
     # gas and brake
     self.accel_lim_prev = self.accel_lim
     apply_accel = actuators.gas - actuators.brake
@@ -134,10 +120,11 @@ class CarController():
     self.steer_rate_limited = new_steer != apply_steer
 
     # disable if steer angle reach 90 deg, otherwise mdps fault in some models
-    lkas_active = enabled and abs(CS.out.steeringAngle) < 90.
+    self.high_steer_allowed = True if self.car_fingerprint in FEATURES["allow_high_steer"] else False
+    lkas_active = enabled and ((abs(CS.out.steeringAngle) < 90.) or self.high_steer_allowed)
 
     # fix for Genesis hard fault at low speed
-    if not self.dp_hkg_smart_mdps and CS.out.vEgo < 16.7 and self.car_fingerprint == CAR.HYUNDAI_GENESIS:
+    if CS.out.vEgo < 55 * CV.KPH_TO_MS and self.car_fingerprint == CAR.HYUNDAI_GENESIS and CS.CP.minSteerSpeed > 0.:
       lkas_active = False
 
     if not lkas_active:
@@ -190,14 +177,14 @@ class CarController():
                                    CS.lkas11, sys_warning, sys_state, enabled,
                                    left_lane, right_lane,
                                    left_lane_warning, right_lane_warning, self.lfa_available, 0))
+
     if CS.CP.mdpsHarness:  # send lkas11 bus 1 if mdps
       can_sends.append(create_lkas11(self.packer, frame, self.car_fingerprint, apply_steer, lkas_active,
                                    CS.lkas11, sys_warning, sys_state, enabled,
                                    left_lane, right_lane,
                                    left_lane_warning, right_lane_warning, self.lfa_available, 1))
-      
-    can_sends.append(create_clu11(self.packer, 1, CS.clu11, Buttons.NONE, enabled_speed, self.clu11_cnt))
 
+      can_sends.append(create_clu11(self.packer, 1, CS.clu11, Buttons.NONE, enabled_speed, self.clu11_cnt))
 
     if pcm_cancel_cmd and CS.scc12["ACCMode"] != 0 and not CS.out.standstill and CS.CP.enableCruise:
       self.vdiff = 0.

@@ -1,6 +1,6 @@
 import copy
 from cereal import car
-from selfdrive.car.hyundai.values import CAR, DBC, STEER_THRESHOLD, FEATURES, ELEC_VEH, HYBRID_VEH
+from selfdrive.car.hyundai.values import DBC, STEER_THRESHOLD, FEATURES, ELEC_VEH, HYBRID_VEH
 from selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from selfdrive.config import Conversions as CV
@@ -10,14 +10,14 @@ GearShifter = car.CarState.GearShifter
 
 class CarState(CarStateBase):
   def __init__(self, CP):
-    super().__init__(CP) 
-    
+    super().__init__(CP)
+
     #Auto detection for setup
     self.cruise_main_button = 0
     self.cruise_buttons = 0
     self.allow_nonscc_available = False
     self.lkasstate = 0
-
+  
     self.lead_distance = 150.
     self.radar_obj_valid = 0.
     self.vrelative = 0.
@@ -26,17 +26,17 @@ class CarState(CarStateBase):
     self.cancel_button_timer = 0
     self.leftblinkerflashdebounce = 0
     self.rightblinkerflashdebounce = 0
-    
+
   def update(self, cp, cp2, cp_cam):
     cp_mdps = cp2 if self.CP.mdpsHarness else cp
     cp_sas = cp2 if self.CP.sasBus else cp
     cp_scc = cp_cam if ((self.CP.sccBus == 2) or self.CP.radarOffCan) else cp
     cp_fca = cp_cam if (self.CP.fcaBus == 2) else cp
-    
+
     self.prev_cruise_buttons = self.cruise_buttons
     self.prev_cruise_main_button = self.cruise_main_button
     self.prev_lkasstate = self.lkasstate
-    
+
     ret = car.CarState.new_message()
 
     ret.doorOpen = any([cp.vl["CGW1"]['CF_Gway_DrvDrSw'], cp.vl["CGW1"]['CF_Gway_AstDrSw'],
@@ -56,18 +56,35 @@ class CarState(CarStateBase):
     ret.steeringAngle = cp_sas.vl["SAS11"]['SAS_Angle']
     ret.steeringRate = cp_sas.vl["SAS11"]['SAS_Speed']
     ret.yawRate = cp.vl["ESP12"]['YAW_RATE']
-    ret.leftBlinker, ret.rightBlinker = self.update_blinker(50, cp.vl["CGW1"]['CF_Gway_TurnSigLh'],
-                                                            cp.vl["CGW1"]['CF_Gway_TurnSigRh'])
+
+    self.leftblinkerflash = cp.vl["CGW1"]['CF_Gway_TurnSigLh'] != 0 and cp.vl["CGW1"]['CF_Gway_TSigLHSw'] == 0
+    self.rightblinkerflash = cp.vl["CGW1"]['CF_Gway_TurnSigRh'] != 0 and cp.vl["CGW1"]['CF_Gway_TSigRHSw'] == 0
+
+    if self.leftblinkerflash:
+      self.leftblinkerflashdebounce = 50
+    elif self.leftblinkerflashdebounce > 0:
+      self.leftblinkerflashdebounce -= 1
+
+    if self.rightblinkerflash:
+      self.rightblinkerflashdebounce = 50
+    elif self.rightblinkerflashdebounce > 0:
+      self.rightblinkerflashdebounce -= 1
+
+    ret.leftBlinker = cp.vl["CGW1"]['CF_Gway_TSigLHSw'] != 0 or self.leftblinkerflashdebounce > 0
+    ret.rightBlinker = cp.vl["CGW1"]['CF_Gway_TSigRHSw'] != 0 or self.rightblinkerflashdebounce > 0
+
     ret.steeringTorque = cp_mdps.vl["MDPS12"]['CR_Mdps_StrColTq']
     ret.steeringTorqueEps = cp_mdps.vl["MDPS12"]['CR_Mdps_OutTq']
+
     ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD
+
     ret.steerWarning = cp_mdps.vl["MDPS12"]['CF_Mdps_ToiUnavail'] != 0
-    
+
     self.brakeHold = (cp.vl["ESP11"]['AVH_STAT'] == 1)
-    
+
     self.cruise_main_button = cp.vl["CLU11"]["CF_Clu_CruiseSwMain"]
     self.cruise_buttons = cp.vl["CLU11"]["CF_Clu_CruiseSwState"]
-    
+
     if not self.cruise_main_button:
       if self.cruise_buttons == 4 and self.prev_cruise_buttons != 4 and self.cancel_button_count < 3:
         self.cancel_button_count += 1
@@ -78,9 +95,9 @@ class CarState(CarStateBase):
         self.cancel_button_timer = max(0, self.cancel_button_timer - 1)
         if self.cancel_button_timer == 0:
           self.cancel_button_count = 0
-      else:
-        self.cancel_button_count = 0
-      
+    else:
+      self.cancel_button_count = 0
+
     # cruise state
     if not self.CP.enableCruise:
       if self.cruise_buttons == 1 or self.cruise_buttons == 2:
@@ -90,14 +107,13 @@ class CarState(CarStateBase):
     elif not self.CP.radarOffCan:
       ret.cruiseState.available = (cp_scc.vl["SCC11"]["MainMode_ACC"] != 0)
       ret.cruiseState.enabled = (cp_scc.vl["SCC12"]['ACCMode'] != 0)
-    
+
     self.lead_distance = cp_scc.vl["SCC11"]['ACC_ObjDist']
     self.vrelative = cp_scc.vl["SCC11"]['ACC_ObjRelSpd']
     self.radar_obj_valid = cp_scc.vl["SCC11"]['ObjValid']
     ret.cruiseState.standstill = cp_scc.vl["SCC11"]['SCCInfoDisplay'] == 4.
 
     self.is_set_speed_in_mph = cp.vl["CLU11"]["CF_Clu_SPEED_UNIT"]
-    
     if ret.cruiseState.enabled:
       speed_conv = CV.MPH_TO_MS if self.is_set_speed_in_mph else CV.KPH_TO_MS
       if self.CP.radarOffCan:
@@ -111,7 +127,6 @@ class CarState(CarStateBase):
     ret.brake = 0
     ret.brakePressed = cp.vl["TCS13"]['DriverBraking'] != 0
     self.brakeUnavailable = cp.vl["TCS13"]['ACCEnable'] == 3
-    
 
     # TODO: Check this
     ret.brakeLights = bool(cp.vl["TCS13"]['BrakeLight'] or ret.brakePressed)
@@ -157,7 +172,7 @@ class CarState(CarStateBase):
       else:
         ret.gearShifter = GearShifter.unknown
     # Gear Selecton - This is only compatible with optima hybrid 2017
-    elif self.CP.carFingerprint in FEATURES["use_elect_gears"]:
+    elif self.CP.evgearAvailable:
       gear = cp.vl["ELECT_GEAR"]["Elect_Gear_Shifter"]
       if gear in (5, 8):  # 5: D, 8: sport mode
         ret.gearShifter = GearShifter.drive
@@ -170,7 +185,7 @@ class CarState(CarStateBase):
       else:
         ret.gearShifter = GearShifter.unknown
     # Gear Selecton - This is not compatible with all Kia/Hyundai's, But is the best way for those it is compatible with
-    else:
+    elif self.CP.lvrAvailable:
       gear = cp.vl["LVR12"]["CF_Lvr_Gear"]
       if gear in (5, 8):  # 5: D, 8: sport mode
         ret.gearShifter = GearShifter.drive
@@ -182,6 +197,7 @@ class CarState(CarStateBase):
         ret.gearShifter = GearShifter.reverse
       else:
         ret.gearShifter = GearShifter.unknown
+
     if self.CP.fcaBus != -1:
       ret.stockAeb = cp_fca.vl["FCA11"]['FCA_CmdAct'] != 0
       ret.stockFcw = cp_fca.vl["FCA11"]['CF_VSM_Warn'] == 2
@@ -192,7 +208,6 @@ class CarState(CarStateBase):
     if self.CP.bsmAvailable:
       ret.leftBlindspot = cp.vl["LCA11"]["CF_Lca_IndLeft"] != 0
       ret.rightBlindspot = cp.vl["LCA11"]["CF_Lca_IndRight"] != 0
-   
 
     self.lkasstate = cp_cam.vl["LKAS11"]["CF_Lkas_LdwsSysState"]
     self.lkasbutton = self.lkasstate != self.prev_lkasstate and (self.lkasstate == 0 or self.prev_lkasstate == 0)
@@ -215,6 +230,7 @@ class CarState(CarStateBase):
 
   @staticmethod
   def get_can_parser(CP):
+    checks = []
     signals = [
       # sig_name, sig_address, default
       ("WHL_SPD_FL", "WHL_SPD11", 0),
@@ -223,8 +239,6 @@ class CarState(CarStateBase):
       ("WHL_SPD_RR", "WHL_SPD11", 0),
 
       ("YAW_RATE", "ESP12", 0),
-      
-      ("AVH_STAT", "ESP11", 0),
 
       ("CF_Gway_DrvSeatBeltInd", "CGW4", 1),
 
@@ -233,11 +247,15 @@ class CarState(CarStateBase):
       ("CF_Gway_AstDrSw", "CGW1", 0),       # Passenger door
       ("CF_Gway_RLDrSw", "CGW2", 0),        # Rear reft door
       ("CF_Gway_RRDrSw", "CGW2", 0),        # Rear right door
+      ("CF_Gway_TSigLHSw", "CGW1", 0),
       ("CF_Gway_TurnSigLh", "CGW1", 0),
+      ("CF_Gway_TSigRHSw", "CGW1", 0),
       ("CF_Gway_TurnSigRh", "CGW1", 0),
       ("CF_Gway_ParkBrakeSw", "CGW1", 0),
 
       ("CYL_PRES", "ESP12", 0),
+
+      ("AVH_STAT", "ESP11", 0),
 
       ("CF_Clu_CruiseSwState", "CLU11", 0),
       ("CF_Clu_CruiseSwMain", "CLU11", 0),
@@ -259,9 +277,9 @@ class CarState(CarStateBase):
 
       ("ESC_Off_Step", "TCS15", 0),
 
-      ("CF_Lvr_GearInf", "LVR11", 0),        # Transmission Gear (0 = N or P, 1-8 = Fwd, 14 = Rev)
+      ("CF_Lvr_CruiseSet", "LVR12", 0),
       ("CRUISE_LAMP_M", "EMS16", 0),
-      
+
       ("CR_VSM_Alive", "SCC12", 0),
       ("AliveCounterACC", "SCC11", 0),
       ("CR_FCA_Alive", "FCA11", 0),
@@ -306,7 +324,7 @@ class CarState(CarStateBase):
         ("Supplemental_Counter", "FCA11", 0),
       ]
       checks += [("FCA11", 50)]
-    
+
     if not CP.mdpsHarness:
       signals += [
         ("CR_Mdps_StrColTq", "MDPS12", 0),
@@ -324,7 +342,6 @@ class CarState(CarStateBase):
       checks += [
         ("MDPS12", 50)
       ]
-      
     if CP.sasBus == 0:
       signals += [
         ("SAS_Angle", "SAS11", 0),
