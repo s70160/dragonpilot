@@ -61,14 +61,14 @@ class opParams:
     """
 
     VT = ValueTypes()
-    self.fork_params = {'MdpsHarnessEnabled': Param(True, bool, 'Toggle to enable MdpsHarness'),
+    self.fork_params = {'MdpsHarnessEnabled': Param(False, bool, 'Toggle to enable MdpsHarness'),
                         'SccEnabled': Param(True, bool, 'Toggle to enable stock scc'),
                         'enableLKASbutton': Param(True, bool, 'general toggle to enable LKAS button, LKAS button press will cancel OP steer'),
-                        'Enable_INDI': Param(False, bool, 'Toggle to enable INDI tuning for lat control'),
+                        'Enable_INDI': Param(True, bool, 'Toggle to enable INDI tuning for lat control'),
                         'SccHarnessPresent': Param(True, bool, 'Toggle to enable sccharness to op creat scc singal '),
                         'LongControlEnabled': Param(True, bool, 'Toggle to enable longcontrol'),
-                        'EnableOPwithCC': Param(True, bool, 'Toggle to enable curise button for lat control'),
-                        'RadarDisableEnabled': Param(True, bool, 'Toggle to enable for disable radar'),
+                        'EnableOPwithCC': Param(False, bool, 'Toggle to enable curise button for lat control'),
+                        'RadarDisableEnabled': Param(False, bool, 'Toggle to enable for disable radar'),
                         'smartMDPS': Param(True, bool, 'Toggle to enable smart MDPS'),
                         'nonlinearsas': Param(True, bool, 'Toggle to enable non linear desired steering angle based tune'),
                         }
